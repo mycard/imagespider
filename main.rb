@@ -81,6 +81,7 @@ class Collection
       '？' => '',
       '?' => '',
       '=' => '',
+      '&' => '',
 
       #single fix
       '龍'  => '竜', #60107471
@@ -104,8 +105,8 @@ class Collection
       'SLIFERTHESKYDRAGON' => 'オシリスの天空竜',
       'OBELISKTHETORMENTOR' => 'オベリスクの巨神兵',
       'THEWINGEDDRAGONOFRA' => 'ラーの翼神竜',
-      'BLUEEYESWHITEDRAGON' => '青眼の白龍',
-      'BlueeyesWhiteDragon' => '青眼の白龍',
+      'BLUEEYESWHITEDRAGON' => '青眼の白竜',
+      'BlueeyesWhiteDragon' => '青眼の白竜',
       'BlackMagician' => 'ブラックマジシャン'
 
   }
