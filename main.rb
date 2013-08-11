@@ -212,6 +212,7 @@ class Collection
     marks = {}
     for h in data
       id                       = h["kanabell_id"]
+      image_basename           = h["kanabell_image_basename"]
       name                     = h["kanabell_name"].to_s
       name                     = name.split(/\(.+?\)/)[0]
       mark                     = score_kanabell(name)
@@ -220,11 +221,11 @@ class Collection
         if mark > marks[name]          # 得分高者替换
           $log.write("进行了版本替换： #{name} 被替换成了得分：#{mark} 的同名卡\n")
           marks[name]    = mark
-          @hash_js[name] = id
+          @hash_js[name] = image_basename
         else                           # 得分低者忽略
         end
       else
-         @hash_js[name] = id
+         @hash_js[name] = image_basename
        marks[name] = mark
       end
     end
