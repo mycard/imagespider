@@ -76,12 +76,18 @@ class Collection
       '／'  => '/',
       '　'  => '',
       ' '  => '',
+      '！' => '',
+      '!' => '',
+      '？' => '',
+      '?' => '',
+      '=' => '',
 
       #single fix
       '龍'  => '竜', #60107471
       '期'  => '後', #60107367
       'R】' => '', #59444207
       '罠'  => '網', #59119904
+      #'MkⅡ' => 'MkII',  # 75937826
       '帚'  => '箒',
       'ぜ'  => 'ゼ',
       '-'  => '',
@@ -97,7 +103,10 @@ class Collection
       'BARRELDRAGON' => 'リボルバードラゴン',
       'SLIFERTHESKYDRAGON' => 'オシリスの天空竜',
       'OBELISKTHETORMENTOR' => 'オベリスクの巨神兵',
-      'THEWINGEDDRAGONOFRA' => 'ラーの翼神竜'
+      'THEWINGEDDRAGONOFRA' => 'ラーの翼神竜',
+      'BLUEEYESWHITEDRAGON' => '青眼の白龍',
+      'BlueeyesWhiteDragon' => '青眼の白龍',
+      'BlackMagician' => 'ブラックマジシャン'
 
   }
 
@@ -142,7 +151,7 @@ class Collection
     end
     return @hash_lib
   end
-
+=begin
   def load_js
     require 'json'
     f    = File.open("orenoturn.json", "r:UTF-8")
@@ -178,7 +187,50 @@ class Collection
     #end
     return @hash_js
   end
+=end
+  # 日版 10 分
+  # 亚英一刷 8 分
+  # 亚英     7 分
+  # 欧版一刷 6 分
+  # 欧版     5 分
+  # 美版一刷 4 分
+  # 美版     3 分
+  # 韩版     0 分
+  def score_kanabell(str)
+    return 10 if (str[/版/] == nil)
+    add = str[/1st/] == nil ? 0 : 1
+    return 7 + add if str[/アジア版/] != nil
+    return 5 + add if str[/英語版/] != nil
+    return 0 + add if str[/韓国版/] != nil
+    return 10
+  end
+  def load_js
+    require 'json'
+    f             = File.open("kanabell.json", "r:UTF-8")
+    data = JSON.parse(f.read)
+    marks = {}
+    for h in data
+      id                       = h["kanabell_id"]
+      name                     = h["kanabell_name"].to_s
+      name                     = name.split(/\(.+?\)/)[0]
+      mark                     = score_kanabell(name)
+      name                     = characters(name)
+      if marks[name] != nil              # 若此项业已存在
+        if mark > marks[name]          # 得分高者替换
+          $log.write("进行了版本替换： #{name} 被替换成了得分：#{mark} 的同名卡\n")
+          marks[name]    = mark
+          @hash_js[name] = id
+        else                           # 得分低者忽略
+        end
+      else
+         @hash_js[name] = id
+       marks[name] = mark
+      end
+    end
+    File.open("js.txt","w:UTF-8") {|f| f.write(@hash_js.inspect)}
 
+    return @hash_js
+  end
   def load_sql
     require 'sqlite3'
     db = SQLite3::Database.new("cards.cdb")
@@ -279,6 +331,6 @@ end
 collection = Collection.new
 ans = collection.merge
 open('result.json', 'w:UTF-8'){|f|f.write ans.to_json}
-lib = collection.check_lib
-open('lib.json', 'w:UTF-8') {|f|f.write lib.to_json}
+#lib = collection.check_lib
+#open('lib.json', 'w:UTF-8') {|f|f.write lib.to_json}
 $log.close
