@@ -10,7 +10,7 @@ class PAPAPA
     	id = key.to_i
     	ar = db.execute("select id from texts where name=(select name from texts where id = #{id} limit 1)")
     	for pas in ar
-    		ans[pas.to_s] = json[key]
+    		ans[pas[0]] = json[key]
     	end
     	puts "Multi Image for #{id} " if ar.size > 1
     end
