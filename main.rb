@@ -118,10 +118,11 @@ class Collection
   	"【SR】"  => 8,
   	"【R】"   => 7,
   	"【NPR】" => 5,
-  	"【GR】"  => 4,
+    "【SC】"  => 4,
   	"【UR】"  => 3,
   	"【UTR】" => 2,
-  	"【SC】"  => 1,
+    "【HR】"  => 1,
+    "【GR】"  => 0,
   	"" => 0,
   	nil => 0
   }
@@ -152,7 +153,7 @@ class Collection
     end
     return @hash_lib
   end
-=begin
+
   def load_js
     require 'json'
     f    = File.open("orenoturn.json", "r:UTF-8")
@@ -167,7 +168,6 @@ class Collection
       exps           = exps.to_s
       name           = name.split(/【.+?】/)[0]
       name           = characters(name)
-
       #$log.write("#{name} 的罕贵为 #{exps}，得分为#{Score[exps]}\n" )
       mark           = Score[exps]   # 得分判定
       mark           = 0 if mark == nil
@@ -188,7 +188,43 @@ class Collection
     #end
     return @hash_js
   end
-=end
+
+  def check_js
+    require 'json'
+    f    = File.open("orenoturn.json", "r:UTF-8")
+    data = JSON.parse(f.read)
+    marks = {}    # 罕贵得分
+    names = {}
+    f.close
+    for h in data
+      next if h['orenoturn_image_basename'][0,11] == 'noimage.jpg'
+      id             = h["orenoturn_id"]
+      name           = h["orenoturn_name"]
+      exps           = /【.+?】/.match(name)
+      exps           = exps.to_s
+      name           = name.split(/【.+?】/)[0]
+      name           = characters(name)
+      mark           = Score[exps]
+      mark           = 0 if mark == nil
+      marks[name]      = [] if marks[name] == nil
+      marks[name].push mark
+      names[id]      = name
+    end
+    f = File.open("CHECK.txt","w")
+    for name in marks.keys
+      b1 = b2 = false
+      for x in marks[name]
+        b1 = true if x == 1
+        b2 = true if x == 4
+      end
+      puts name if b1 && b2
+      f.write(name)
+      f.write("    ")
+      f.write(marks[name])
+      f.write("\n")
+    end
+  end
+
   # 日版 10 分
   # 亚英一刷 8 分
   # 亚英     7 分
@@ -197,6 +233,7 @@ class Collection
   # 美版一刷 4 分
   # 美版     3 分
   # 韩版     0 分
+
   def score_kanabell(str)
     return 10 if (str[/版/] == nil)
     add = str[/1st/] == nil ? 0 : 1
@@ -205,6 +242,7 @@ class Collection
     return 0 + add if str[/韓国版/] != nil
     return 10
   end
+=begin
   def load_js
     require 'json'
     f             = File.open("kanabell.json", "r:UTF-8")
@@ -232,6 +270,7 @@ class Collection
 
     return @hash_js
   end
+=end
   def load_sql
     require 'sqlite3'
     db = SQLite3::Database.new("cards.cdb")
@@ -332,6 +371,6 @@ end
 collection = Collection.new
 ans = collection.merge
 open('result.json', 'w:UTF-8'){|f|f.write ans.to_json}
-#lib = collection.check_lib
-#open('lib.json', 'w:UTF-8') {|f|f.write lib.to_json}
+lib = collection.check_lib
+open('lib.json', 'w:UTF-8') {|f|f.write lib.to_json}
 $log.close
