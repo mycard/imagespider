@@ -3,7 +3,7 @@ class PAPAPA
  def load_lays
     require 'sqlite3'
     require 'json'
-    db = SQLite3::Database.new("cards.cdb")
+    db = SQLite3::Database.new("cards-zh.cdb")
     json = JSON.parse(File.open("images_wikia.json","r:UTF-8"){|f| f.read})
     ans = {}
     for key in json.keys
@@ -22,7 +22,7 @@ class BABABA
     def load_lays
         require 'sqlite3'
         require 'json'
-        db = SQLite3::Database.new("cards.cdb")
+        db = SQLite3::Database.new("cards-zh.cdb")
         json = JSON.parse(File.open("images_wikia.json","r:UTF-8"){|f| f.read})
         pas = {}
         data = Hash[db.execute 'select id,name from texts']
@@ -32,12 +32,12 @@ class BABABA
             pas[name].push id
         end
         ids = pas.values
-        #f = File.open("CHECK.txt","w")
-        #for id in ids
-        #    f.write(id)
-        #    f.write("\n")
-        #end
-        #f.close
+        f = File.open("CHECK.txt","w")
+        for id in ids
+            f.write(id)
+            f.write("\n")
+        end
+        f.close
         ans = {}
         for key in json.keys
             id = key.to_i
@@ -53,5 +53,5 @@ class BABABA
 end
 
 
-ans = BABABA.new.load_lays
+ans = PAPAPA.new.load_lays
 open('wiki.json', 'w:UTF-8'){|f|f.write ans.to_json}
